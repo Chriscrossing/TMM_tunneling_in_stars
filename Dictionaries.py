@@ -31,8 +31,8 @@ constants = {
         'e': const.e,
         'r_strong': 0.7*10**(-15),
         'm': const.proton_mass*10,
-        'divs': 50,
-        'E_divs': 100
+        'divs': 1000,
+        'E_divs': 1000
         }
 ###############################################################################
 #Variables
@@ -50,26 +50,26 @@ elect_vars = {
 
 
 steps_vars = {
-        'rpts': 3,
-        'divs_max': 1000,
+        'rpts': 300,
         'divs_min': 10,
+        'divs_max': 5000,
         'divs': constants.get('divs'), 
         'E_divs': constants.get('E_divs'), 
         'E_min': constants.get('e')/10,
-        'E_max': 10000000*constants.get('e'),                 
-        'r_start':100**(-9), #8.7e-16,                 #RHS of the barrier. 
+        'E_max': 3e6*constants.get('e'),                 
+        'r_start':1e-12,                 #RHS of the barrier. 
         'r_end': constants.get('r_strong')             #LHS of the barrier. 
 }
 
 E_vars = {
-        'rpts': 500,
-        'divs_max': 5000,
+        'rpts': 300,
         'divs_min': 10,
+        'divs_max': 5000,
         'divs': constants.get('divs'), 
         'E_divs': constants.get('E_divs'), 
         'E_min': constants.get('e')/10,
-        'E_max': 10000000*constants.get('e'),                 
-        'r_start':100**(-9), #8.7e-16,                 #RHS of the barrier. 
+        'E_max': 3e6*constants.get('e'),                 
+        'r_start': 1e-12,                 #RHS of the barrier. 
         'r_end': constants.get('r_strong')             #LHS of the barrier. 
 }
 

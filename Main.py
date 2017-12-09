@@ -49,15 +49,19 @@ class converge:
         Analysis.converge_steps(Potential_barriers.elect,Dictionaries.constants,Dictionaries.steps_vars,keyword)
         return 
     
+    def solar_steps(keyword):
+        Analysis.solar_steps_convergence(Potential_barriers.elect,Dictionaries.constants,Dictionaries.steps_vars,keyword)
+        return
+    
+    
     def E_res(keyword):
         Analysis.converge_E(Potential_barriers.elect,Dictionaries.constants,Dictionaries.E_vars,keyword)       
         return 
     
-    def Both(keyword):
+    def solar_E_res(keyword):
+        Analysis.solar_E_res_convergence(Potential_barriers.elect,Dictionaries.constants,Dictionaries.E_vars,keyword)
         return
         
-#    def square():
-#        return converge(square,constants,square_vars,analysis_vars)
         
     def step_plot(filename,keyword):
         Analysis.steps_plot(filename,Dictionaries.constants,keyword)

@@ -103,28 +103,31 @@ def TRplot(keyword,data,c,v):
     #P = data.get('TR')[T,0]
     
     '''
-    New way using DanHickstien's methord from stackoverflow (see link above 
+    New way using DanHickstien's methord from stackoverflow see link above 
     the function at the top of this script.
     
     Linearly interpolated between data points.
     '''   
+    core_temp = 1290*c.get('e')    
+    xc, yc = interpolated_intercept(data.get('TR')[:,0],data.get('E_range'),core_temp*np.ones(len(data.get('E_range'))))   
+    xc = np.max(xc)
+    print(xc)
+    yc = np.max(yc)
+    print(yc)
     
-    xc, yc = interpolated_intercept(data.get('E_range'),data.get('TR')[:,1],data.get('TR')[:,0])   
-    xc = max(xc)/(c.get('e')*1e6)
-    yc = max(yc)    
-    error = "unkown yet"    
-    text = str(np.around(xc[0],decimals=4)) + " MeV $\pm$ " + str(error)    
-    ax.plot(xc,yc,'o',color='red',label=text)    
+    #error = "unknown yet"    
+    #text = 'Transmission coefficient for solar temperature = ' + str(transmission)     
+    #ax.plot(xc,yc,'o',color='red',label=text)    
     #legend
-    plt.legend(frameon = False, fontsize = 10, numpoints = 1, loc='center right')
+    #plt.legend(frameon = False, fontsize = 10, numpoints = 1, loc='center right')
 
 
 
     
     #Save the figure into its own directory, with a keyword and the settings it 
     #was produced with.
-    filenameA =  "_" + str(keyword) + "_" + str(v.get('barrier')) + "_divs_" + str(v.get('divs')) + "_E_divs_" + str(v.get('E_divs'))
-    plt.savefig("Figures/Transmission_Reflection/" + filenameA + ".eps", format='eps', dpi=600)
+    #filenameA =  "_" + str(keyword) + "_" + str(v.get('barrier')) + "_divs_" + str(v.get('divs')) + "_E_divs_" + str(v.get('E_divs'))
+    #plt.savefig("Figures/Transmission_Reflection/" + filenameA + ".eps", format='eps', dpi=600)
 
 ###############################################################################
     """
@@ -159,24 +162,60 @@ def converge_steps(v_r,c,a,keyword):
 
     for i in range(0,a.get('rpts')):
         t1 = time.datetime.now()
+        
         a["divs"] = divs_range[i]
+        
         print(str(np.around((divs_range[i]/a.get('divs_max'))*100,1)) + "%")
+        
         data = TMM.TMM(v_r,c,a)
-        T = np.argmin(abs(data.get('TR')[:,0] - (0.5)*np.ones(len(data.get('TR')))))        
-        E[i] = data.get('E_range')[T]
+        
+        #plt.plot(data.get('E_range')/(c.get('e')*1e6),data.get('TR'))
+        xc, yc = interpolated_intercept(data.get('E_range'),0.5*np.ones(len(data.get('E_range'))),data.get('TR')[:,0])   
+        
+        #print('steps= ' + str(divs_range[i])+ ' xc= ' + str(xc))
+        
+        E[i] = np.max(xc)
         
         t2 = time.datetime.now() - t1
         t[i] = t2.total_seconds() 
         
     filenameC =  str(keyword)+ "_" + str(a.get('divs_min')) + "to" + str(a.get('divs_max')) + "_rpts_" + str(a.get('rpts'))
-    np.save("Data/Divs_convergence/" + filenameC, (divs_range, E,t)) 
+    np.save("Data/Steps_convergence/" + filenameC, (divs_range, E,t)) 
     return 
+
+def solar_steps_convergence(v_r,c,a,keyword):
+    divs_range = np.linspace(a.get('divs_min'),a.get('divs_max'),a.get('rpts'))
+    divs_range = divs_range.astype(int)
+    T = np.zeros((a.get('rpts'))) 
+    t = np.zeros((a.get('rpts')))
+
+    for i in range(0,a.get('rpts')):
+        t1 = time.datetime.now()
+        a["divs"] = divs_range[i]        
+        print(str(np.around((divs_range[i]/a.get('divs_max'))*100,1)) + "%")        
+        data = TMM.TMM(v_r,c,a)        
+        #plt.plot(data.get('E_range')/(c.get('e')*1e6),data.get('TR'))
+        
+        core_temp = 1290*c.get('e')
+        xc, yc = interpolated_intercept(data.get('TR')[:,0],data.get('E_range'),core_temp*np.ones(len(data.get('E_range'))))   
+        
+        #print('steps= ' + str(divs_range[i])+ ' xc= ' + str(xc))
+        
+        T[i] = np.max(xc)
+        
+        t2 = time.datetime.now() - t1
+        t[i] = t2.total_seconds()
+        
+          
+    filenameC =  str(keyword)+ "_" + str(a.get('divs_min')) + "to" + str(a.get('divs_max')) + "_rpts_" + str(a.get('rpts'))
+    np.save("Data/Solar_Steps_convergence/" + filenameC, (divs_range, T,t)) 
+    return  
 
 #####################################################################################################
 
 
 
-def converge_E(v_r,c,v,a,keyword):
+def converge_E(v_r,c,a,keyword):
     
     E_divs_range = np.linspace(a.get('divs_min'),a.get('divs_max'),a.get('rpts'))
     E_divs_range = E_divs_range.astype(int)
@@ -186,17 +225,46 @@ def converge_E(v_r,c,v,a,keyword):
     for i in range(0,a.get('rpts')):
         t1 = time.datetime.now()
         print(str(np.around((E_divs_range[i]/a.get('divs_max'))*100,1)) + "%")
-        v["E_divs"] = E_divs_range[i]
-        data = TMM(v_r,c,v)
-        T = np.argmin(abs(data.get('TR')[:,0] - (0.5)))        
-        E[i] = data.get('E_range')[T]
+        a["E_divs"] = E_divs_range[i]
+        data = TMM.TMM(v_r,c,a)
+        xc, yc = interpolated_intercept(data.get('E_range'),0.5*np.ones(len(data.get('E_range'))),data.get('TR')[:,0])   
+        #print('steps= ' + str(divs_range[i])+ ' xc= ' + str(xc))
+        E[i] = np.max(xc)
         
         t2 = time.datetime.now() - t1
         t[i] = t2.total_seconds() 
         
     filenameD =  str(keyword) + "_" + str(a.get('divs_min')) + "to" + str(a.get('divs_max')) + "_rpts_" + str(a.get('rpts'))
-    np.save("Data/E_Divs_convergence/" + filenameD, (E_divs_range, E,t))    
+    np.save("Data/E_res_convergence/" + filenameD, (E_divs_range, E,t))    
     return 
+
+def solar_E_res_convergence(v_r,c,a,keyword):
+    E_divs_range = np.linspace(a.get('divs_min'),a.get('divs_max'),a.get('rpts'))
+    E_divs_range = E_divs_range.astype(int)
+    T = np.zeros((a.get('rpts'))) 
+    t = np.zeros((a.get('rpts')))
+
+    for i in range(0,a.get('rpts')):
+        t1 = time.datetime.now()
+        a["E_divs"] = E_divs_range[i]        
+        print(str(np.around((E_divs_range[i]/a.get('divs_max'))*100,1)) + "%")      
+        data = TMM.TMM(v_r,c,a)        
+        #plt.plot(data.get('E_range')/(c.get('e')*1e6),data.get('TR'))
+        
+        core_temp = 1290*c.get('e')
+        xc, yc = interpolated_intercept(data.get('TR')[:,0],data.get('E_range'),core_temp*np.ones(len(data.get('E_range'))))   
+        
+        #print('steps= ' + str(divs_range[i])+ ' xc= ' + str(xc))
+        
+        T[i] = np.max(xc)
+        
+        t2 = time.datetime.now() - t1
+        t[i] = t2.total_seconds()
+        
+          
+    filenameC =  str(keyword)+ "_" + str(a.get('divs_min')) + "to" + str(a.get('divs_max')) + "_rpts_" + str(a.get('rpts'))
+    np.save("Data/Solar_E_res_convergence/" + filenameC, (E_divs_range, T,t)) 
+    return  
 
 #####################################################################################################
 
@@ -214,8 +282,8 @@ def steps_plot(filename,c,keyword):
     plt.xlabel('No. of Potential steps', fontsize=13)
     plt.ylabel('KE / MeV', fontsize=13)
     ax.plot(divs_range,E/(c.get('e')*1e6), label='KE where 50% of collisions would fuse')     
-    text = 'Converges after 1330 potential steps' 
-    ax.plot(1330,E[divs_range == 1330]/(c.get('e')*1e6) ,'o',color='red',label=text)    
+    #text = 'Converges after 1330 potential steps' 
+    #ax.plot(1330,E[divs_range == 1330]/(c.get('e')*1e6) ,'o',color='red',label=text)    
     plt.legend(frameon = False, fontsize = 10, numpoints = 1, loc='lower right')
 
     plt.savefig("Figures/Potential_steps_Convergence/" + filenameC + "KE.eps", format='eps', dpi=600)
@@ -224,8 +292,8 @@ def steps_plot(filename,c,keyword):
     bx.plot(divs_range,t/60,'x',label='Time taken for simulation')  
     plt.ylabel('Time / minutes', fontsize=13)
     plt.xlabel('No. of Potential steps', fontsize=13)
-    text = 'Max accuracy at time of ' + str(np.around(t[divs_range == 1330],2)) + ' seconds'
-    bx.plot(1330,t[divs_range == 1330]/60 ,'o',color='red',label=text)    
+    #text = 'Max accuracy at time of ' + str(np.around(t[divs_range == 1330],2)) + ' seconds'
+    #bx.plot(1330,t[divs_range == 1330]/60 ,'o',color='red',label=text)    
     plt.legend(frameon = False, fontsize = 10, numpoints = 1, loc='upper left')
     plt.savefig("Figures/Potential_steps_Convergence/" + filenameC + "time.eps", format='eps', dpi=600)
     return

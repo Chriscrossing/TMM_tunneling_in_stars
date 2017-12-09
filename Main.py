@@ -59,11 +59,11 @@ class converge:
 #    def square():
 #        return converge(square,constants,square_vars,analysis_vars)
         
-    def step_plot(filename):
-        Analysis.steps_plot(filename,Dictionaries.constants)
+    def step_plot(filename,keyword):
+        Analysis.steps_plot(filename,Dictionaries.constants,keyword)
         return 
    
-    def E_res_plot(filename):
-        Analysis.E_plot(filename,Dictionaries.constants)
+    def E_res_plot(filename,keyword):
+        Analysis.E_plot(filename,Dictionaries.constants,keyword)
         return
     

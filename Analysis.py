@@ -83,7 +83,7 @@ def TRplot(keyword,data,c,v):
     """
     
     #setting up the first figure.    
-    f, ax = plt.subplots(1,figsize=(10,4))
+    f, ax = plt.subplots(1,figsize=(10,4.5))
     plt.xlabel('Incident energy / MeV', fontsize=15)
     plt.ylabel('Probability', fontsize=15)
     
@@ -111,16 +111,11 @@ def TRplot(keyword,data,c,v):
     
     xc, yc = interpolated_intercept(data.get('E_range'),data.get('TR')[:,1],data.get('TR')[:,0])   
     xc = max(xc)/(c.get('e')*1e6)
-    yc = max(yc)
-    
-    error = "unkown yet"
-    
-    text = str(np.around(xc[0],decimals=4)) + " MeV $\pm$ " + str(error)
-    
-    ax.plot(xc,yc,'o',color='red',label=text)
-    
+    yc = max(yc)    
+    error = "unkown yet"    
+    text = str(np.around(xc[0],decimals=4)) + " MeV $\pm$ " + str(error)    
+    ax.plot(xc,yc,'o',color='red',label=text)    
     #legend
-    
     plt.legend(frameon = False, fontsize = 10, numpoints = 1, loc='center right')
 
 
@@ -141,7 +136,7 @@ def TRplot(keyword,data,c,v):
     mid = np.insert(mid,[0,len(mid)],[mid[0],0])
     
     #Setting up and plotting the second figure.
-    f, bx = plt.subplots(1,figsize=(10,4))
+    f, bx = plt.subplots(1,figsize=(10,4.5))
     plt.xlabel('Distance / fm ', fontsize=15)
     plt.ylabel('Potential Height / MeV  ', fontsize=15)
     bx.plot(mid/(1e-15),data.get('Height')/(c.get('e')*1e6),drawstyle='steps-pre')
@@ -208,45 +203,52 @@ def converge_E(v_r,c,v,a,keyword):
 
 
 
-def steps_plot(filename,c):
+def steps_plot(filename,c,keyword):
     
     (divs_range,E,t) = np.load("Data/Divs_convergence/" + filename + ".npy")
     
+    filenameC =  str(keyword)
     
-    f, ax = plt.subplots(1)
-    plt.xlabel('No. of Potential steps', fontsize=13)
-    plt.ylabel('KE where 50% of collisions would fuse / MeV', fontsize=13)
-    ax.plot(divs_range,E/(c.get('e')*1e6),'x')     
-    #ax.plot(divs_range, np.polyval(p1,divs_range),color='green',linewidth=2) 
-    ax.plot(divs_range, max(E)*np.ones(len(divs_range))/(c.get('e')*1e6))
     
-    f, bx = plt.subplots(1)
-    bx.plot(divs_range,t/60,'x')  
-    plt.ylabel('time taken for simulation / minutes', fontsize=13)
+    f, ax = plt.subplots(1,figsize=(10,4.5))
     plt.xlabel('No. of Potential steps', fontsize=13)
+    plt.ylabel('KE / MeV', fontsize=13)
+    ax.plot(divs_range,E/(c.get('e')*1e6), label='KE where 50% of collisions would fuse')     
+    text = 'Converges after 1330 potential steps' 
+    ax.plot(1330,E[divs_range == 1330]/(c.get('e')*1e6) ,'o',color='red',label=text)    
+    plt.legend(frameon = False, fontsize = 10, numpoints = 1, loc='lower right')
 
-        
-    #filenameC =  str(keyword)+ "_" + str(a.get('divs_min')) + "to" + str(a.get('divs_max')) + "_rpts_" + str(a.get('rpts'))
-    #plt.savefig("Figures/Potential_steps_Convergence/" + filenameC + ".eps", format='eps', dpi=600)
+    plt.savefig("Figures/Potential_steps_Convergence/" + filenameC + "KE.eps", format='eps', dpi=600)
+    
+    f, bx = plt.subplots(1,figsize=(10,4.5))
+    bx.plot(divs_range,t/60,'x',label='Time taken for simulation')  
+    plt.ylabel('Time / minutes', fontsize=13)
+    plt.xlabel('No. of Potential steps', fontsize=13)
+    text = 'Max accuracy at time of ' + str(np.around(t[divs_range == 1330],2)) + ' seconds'
+    bx.plot(1330,t[divs_range == 1330]/60 ,'o',color='red',label=text)    
+    plt.legend(frameon = False, fontsize = 10, numpoints = 1, loc='upper left')
+    plt.savefig("Figures/Potential_steps_Convergence/" + filenameC + "time.eps", format='eps', dpi=600)
     return
 
-def E_plot(filename,c): 
+
+
+
+def E_plot(filename,c,keyword): 
     
     (divs_range,E,t) = np.load("Data/E_Divs_convergence/" + filename + ".npy")
     
     #p2 = np.polyfit(divs_range,E/(c.get('e')*1e6),4,cov=False)
+    filenameD =  str(keyword)
 
-    f, ax = plt.subplots(1)
+    f, ax = plt.subplots(1,figsize=(10,4.5))
     plt.xlabel('Resolution of incident energies', fontsize=13)
-    plt.ylabel('KE where 50% of collisions would fuse / MeV', fontsize=13)
-    ax.plot(divs_range,E/(c.get('e')*1e6),'x')    
+    plt.ylabel('KE / MeV', fontsize=13)
+    ax.plot(divs_range,E/(c.get('e')*1e6),'x',label='KE where 50% of collisions would fuse')    
     #dx.plot(divs_range, np.polyval(p2,divs_range),color='green',linewidth=2)
+    plt.savefig("Figures/E_Res_Convergence/" + filenameD + "KE.eps", format='eps', dpi=600)
     
-    f, bx = plt.subplots(1)
-    bx.plot(divs_range,t/60,'x')  
-    plt.ylabel('time taken for simulation / seconds', fontsize=13)
+    f, bx = plt.subplots(1,figsize=(10,4.5))
+    bx.plot(divs_range,t/60,'x',label='Time taken for simulation')  
+    plt.ylabel('Time / minutes', fontsize=13)
     plt.xlabel('Resolution of incident energies', fontsize=13)
-
-
-#    filenameD =  str(keyword) + "_" + str(a.get('divs_min')) + "to" + str(a.get('divs_max')) + "_rpts_" + str(a.get('rpts'))
-#    plt.savefig("Figures/E_Res_Convergence/" + filenameD + ".eps", format='eps', dpi=600)  
+    plt.savefig("Figures/E_Res_Convergence/" + filenameD + "Time.eps", format='eps', dpi=600)  

@@ -25,7 +25,7 @@ def elect(r,c,v) :
 
 
 def linear(r,c,v) :
-    return linear_vars.get('grad')*r + linear_vars.get('y-intercept')
+    return v.get('grad')*r + v.get('y-intercept')
 
 def square(r,c,v):
     return v.get('Height')

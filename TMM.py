@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 General TMM and analysis
-Copyright (C) 2017  Christian Johnson-Richards
+Copyright (C) 2017  Christian Johnson-Richards 
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

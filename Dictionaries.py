@@ -30,9 +30,9 @@ constants = {
         'e_0': const.epsilon_0,
         'e': const.e,
         'r_strong': 0.7*10**(-15),
-        'm': const.proton_mass,
-        'divs': 100,
-        'E_divs': 100
+        'm': const.proton_mass*10,
+        'divs': 10,
+        'E_divs': 50
         }
 ###############################################################################
 #Variables
@@ -44,7 +44,7 @@ elect_vars = {
         'E_divs': constants.get('E_divs'), 
         'E_min': constants.get('e')/10,
         'E_max': 10000000*constants.get('e'),                 
-        'r_start':100**(-9), #8.7e-16,                 #RHS of the barrier. 
+        'r_start': 1e-12,                           #RHS of the barrier. 
         'r_end': constants.get('r_strong')             #LHS of the barrier. 
 }
 
@@ -73,31 +73,6 @@ E_vars = {
         'r_end': constants.get('r_strong')             #LHS of the barrier. 
 }
 
-
-
-elect_vars_2 = {
-        'divs': constants.get('divs'), 
-        'E_divs': constants.get('E_divs'), 
-        'E_min': constants.get('e'),
-        'E_max': 1e-14,                 
-        'r_start':constants.get('r_strong') + 1e-9,    #RHS of the barrier. 
-        'r_end': constants.get('r_strong')             #LHS of the barrier. 
-}
-
-
-linear_vars = {
-        'barrier': "linear",
-        'divs': constants.get('divs'), 
-        'E_divs': constants.get('E_divs'), 
-        'E_min': 0,
-        'E_max': 2*constants.get('e'),                 
-        'r_start':constants.get('r_strong'), #8.7e-16,                 #RHS of the barrier. 
-        'r_end': 0,             #LHS of the barrier. 
-        'y-intercept': 2*constants.get('e'),
-        'grad': -1    
-}
-
-
 square_vars = {
         'barrier': "square",
         'divs': constants.get('divs'), 
@@ -107,5 +82,30 @@ square_vars = {
         'r_start':1e-9,
         'r_end': 0,
         'Height': 10*constants.get('e')
+}
+
+linear_vars = {
+        'barrier': "linear",
+        'divs': constants.get('divs'), 
+        'E_divs': constants.get('E_divs'), 
+        'E_min': 0,
+        'E_max': 2*constants.get('e'),                 
+        'r_start':constants.get('r_strong'), #8.7e-16,                 #RHS of the barrier. 
+        'r_end': 0,             #LHS of the barrier. 
+        'y-intercept': 2e6*constants.get('e'),
+        'grad': -1    
+}
+
+
+
+
+
+elect_vars_2 = {
+        'divs': constants.get('divs'), 
+        'E_divs': constants.get('E_divs'), 
+        'E_min': constants.get('e'),
+        'E_max': 1e-14,                 
+        'r_start':constants.get('r_strong') + 1e-9,    #RHS of the barrier. 
+        'r_end': constants.get('r_strong')             #LHS of the barrier. 
 }
 ###############################################################################

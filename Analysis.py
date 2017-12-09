@@ -62,7 +62,7 @@ def TRplot(keyword,data,c,v):
     #Import data from the dictionary created by the TMM function.
     mid = data.get('mid')
     #This bit adds extra zero values in order to make the figure more readable. 
-    mid = np.insert(mid,[0,len(mid)],[0,mid[len(mid)-1]])
+    mid = np.insert(mid,[0,len(mid)],[mid[0],0])
     
     #Setting up and plotting the second figure.
     f, bx = plt.subplots(1,figsize=(10,4))

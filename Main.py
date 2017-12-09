@@ -33,12 +33,12 @@ class Tunneling:
         return 
     
     def square(keyword):
-        data = TMM(Potential_barriers.square,Dictionaries.constants,Dictionaries.square_vars)
+        data = TMM.TMM(Potential_barriers.square,Dictionaries.constants,Dictionaries.square_vars)
         Analysis.TRplot(keyword,data,Dictionaries.constants,Dictionaries.square_vars)
         return
     
     def linear(keyword): 
-        data = TMM(Potential_barriers.linear,Dictionaries.constants,Dictionaries.linear_vars)
+        data = TMM.TMM(Potential_barriers.linear,Dictionaries.constants,Dictionaries.linear_vars)
         Analysis.TRplot(keyword,data,Dictionaries.constants,Dictionaries.linear_vars)
         return  
  

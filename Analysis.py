@@ -26,6 +26,52 @@ import matplotlib.patches as mpatches
 from matplotlib import pyplot as plt
 import datetime as time 
 
+"""
+Not my function, this is taken from:
+https://stackoverflow.com/questions/42464334/find-the-intersection-of-two-curves-given-by-x-y-data-with-high-precision-in
+
+Does a nice job of interpolation.
+"""
+def interpolated_intercept(x, y1, y2):
+    """Find the intercept of two curves, given by the same x data"""
+
+    def intercept(point1, point2, point3, point4):
+        """find the intersection between two lines
+        the first line is defined by the line between point1 and point2
+        the first line is defined by the line between point3 and point4
+        each point is an (x,y) tuple.
+
+        So, for example, you can find the intersection between
+        intercept((0,0), (1,1), (0,1), (1,0)) = (0.5, 0.5)
+
+        Returns: the intercept, in (x,y) format
+        """    
+
+        def line(p1, p2):
+            A = (p1[1] - p2[1])
+            B = (p2[0] - p1[0])
+            C = (p1[0]*p2[1] - p2[0]*p1[1])
+            return A, B, -C
+
+        def intersection(L1, L2):
+            D  = L1[0] * L2[1] - L1[1] * L2[0]
+            Dx = L1[2] * L2[1] - L1[1] * L2[2]
+            Dy = L1[0] * L2[2] - L1[2] * L2[0]
+
+            x = Dx / D
+            y = Dy / D
+            return x,y
+
+        L1 = line([point1[0],point1[1]], [point2[0],point2[1]])
+        L2 = line([point3[0],point3[1]], [point4[0],point4[1]])
+
+        R = intersection(L1, L2)
+
+        return R
+
+    idx = np.argwhere(np.diff(np.sign(y1 - y2)) != 0)
+    xc, yc = intercept((x[idx], y1[idx]),((x[idx+1], y1[idx+1])), ((x[idx], y2[idx])), ((x[idx+1], y2[idx+1])))
+    return xc,yc
 
 def TRplot(keyword,data,c,v):
         
@@ -35,20 +81,50 @@ def TRplot(keyword,data,c,v):
     
     This first section produces a figure for the tunneling and reflection probability.
     """
-  
+    
     #setting up the first figure.    
     f, ax = plt.subplots(1,figsize=(10,4))
     plt.xlabel('Incident energy / MeV', fontsize=15)
     plt.ylabel('Probability', fontsize=15)
     
-    #Ledgend
-    Blue_Patch = mpatches.Patch( label='Tunneling Probability')
-    Green_Patch = mpatches.Patch(color='green', label='Reflection Probability')
-    plt.legend(handles=[Blue_Patch,Green_Patch],fontsize=8)
-    
     #Plot both data sets.
-    ax.plot(data.get('E_range')/(c.get('e')*1e6),data.get('TR')[:,1],color='green',linewidth=2)
-    ax.plot(data.get('E_range')/(c.get('e')*1e6),data.get('TR')[:,0],linewidth=2)
+
+    ax.plot(data.get('E_range')/(c.get('e')*1e6),data.get('TR')[:,1],color='green',linewidth=2,label='Reflection probaility')
+    ax.plot(data.get('E_range')/(c.get('e')*1e6),data.get('TR')[:,0],linewidth=2,label='Transmission probaility')
+
+    #Plot intecept point
+    
+    '''
+    Old way of working out what energy the transmission and reflection probabilities 
+    crossed.
+    '''
+    #T = np.argmin(abs(data.get('TR')[:,0] - (0.5)*np.ones(len(data.get('TR')))))        
+    #E = data.get('E_range')[T]/(c.get('e')*1e6)
+    #P = data.get('TR')[T,0]
+    
+    '''
+    New way using DanHickstien's methord from stackoverflow (see link above 
+    the function at the top of this script.
+    
+    Linearly interpolated between data points.
+    '''   
+    
+    xc, yc = interpolated_intercept(data.get('E_range'),data.get('TR')[:,1],data.get('TR')[:,0])   
+    xc = max(xc)/(c.get('e')*1e6)
+    yc = max(yc)
+    
+    error = "unkown yet"
+    
+    text = str(np.around(xc[0],decimals=4)) + " MeV $\pm$ " + str(error)
+    
+    ax.plot(xc,yc,'o',color='red',label=text)
+    
+    #legend
+    
+    plt.legend(frameon = False, fontsize = 10, numpoints = 1, loc='center right')
+
+
+
     
     #Save the figure into its own directory, with a keyword and the settings it 
     #was produced with.

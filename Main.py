@@ -25,7 +25,7 @@ import TMM
 import Analysis 
 
 
-class Tunneling:
+class tunneling:
     
     def electropotential(keyword):
         data = TMM.TMM(Potential_barriers.elect,Dictionaries.constants,Dictionaries.elect_vars)

@@ -2,7 +2,7 @@
 
 Newcastle University Physics stage 3 group project.
 
-Utilising the transfer matrix method to approximate proton energy in stellar fusion.
+Utilising the transfer matrix method to approximate proton-proton tunneling in stellar fusion.
 
 # Requirements
 
